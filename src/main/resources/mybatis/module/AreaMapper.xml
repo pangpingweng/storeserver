@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.AreaMapper">
+
+    <resultMap type="Area" id="AreaResult">
+        <result property="areaId"    column="area_id"    />
+        <result property="storeId"    column="store_id"    />
+        <result property="storeName"    column="store_name"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="areaSize"    column="area_size"    />
+        <result property="areaTemp"    column="area_temp"    />
+        <result property="areaHumidity"    column="area_humidity"    />
+        <result property="warnTemp"    column="warn_temp"    />
+        <result property="warnHumidity"    column="warn_humidity"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="store_status"    column="store_status"    />
+        <result property="store_address"    column="store_address"    />
+        <result property="area_downtemp"    column="area_downtemp"    />
+        <result property="area_downhumidity"    column="area_downhumidity"    />
+    </resultMap>
+
+    <sql id="selectAreaVo">
+        select a.area_id, a.store_id, s.store_name, a.area_name, a.area_size, a.area_temp, a.area_humidity, a.warn_temp, a.warn_humidity, a.create_time, a.remark,a.store_status,a.store_address,area_downtemp,area_downhumidity
+        from module_area a
+                 inner join module_store s on a.store_id = s.store_id
+    </sql>
+
+    <select id="selectAreaList" parameterType="Area" resultMap="AreaResult">
+        <include refid="selectAreaVo"/>
+        <where>
+            <if test="manager_id != null "> and s.manager_id = #{manager_id}</if>
+            <if test="storeId != null  and storeId != ''"> and s.store_id = #{storeId}</if>
+            <if test="areaName != null  and areaName != ''"> and a.area_name like concat('%', #{areaName}, '%')</if>
+            <if test="store_status != null  and store_status != ''"> and a.store_status like concat('%', #{store_status}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectAreaByAreaId" parameterType="Long" resultMap="AreaResult">
+        <include refid="selectAreaVo"/>
+        where a.area_id = #{areaId}
+    </select>
+
+    <insert id="insertArea" parameterType="Area" useGeneratedKeys="true" keyProperty="areaId">
+        insert into module_area
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">store_id,</if>
+            <if test="storeName != null">store_name,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="areaSize != null">area_size,</if>
+            <if test="areaTemp != null">area_temp,</if>
+            <if test="areaHumidity != null">area_humidity,</if>
+            <if test="warnTemp != null">warn_temp,</if>
+            <if test="warnHumidity != null">warn_humidity,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="store_status != null">store_status,</if>
+            <if test="store_address != null">store_address,</if>
+            <if test="area_downtemp != null">area_downtemp,</if>
+            <if test="area_downhumidity != null">area_downhumidity,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="storeId != null">#{storeId},</if>
+            <if test="storeName != null">#{storeName},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="areaSize != null">#{areaSize},</if>
+            <if test="areaTemp != null">#{areaTemp},</if>
+            <if test="areaHumidity != null">#{areaHumidity},</if>
+            <if test="warnTemp != null">#{warnTemp},</if>
+            <if test="warnHumidity != null">#{warnHumidity},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="store_status != null">#{store_status},</if>
+            <if test="store_address != null">#{store_address},</if>
+            <if test="area_downtemp != null">#{area_downtemp},</if>
+            <if test="area_downhumidity != null">#{area_downhumidity},</if>
+        </trim>
+    </insert>
+
+    <update id="updateArea" parameterType="Area">
+        update module_area
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="storeName != null">store_name = #{storeName},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="areaSize != null">area_size = #{areaSize},</if>
+            <if test="areaTemp != null">area_temp = #{areaTemp},</if>
+            <if test="areaHumidity != null">area_humidity = #{areaHumidity},</if>
+            <if test="warnTemp != null">warn_temp = #{warnTemp},</if>
+            <if test="warnHumidity != null">warn_humidity = #{warnHumidity},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="store_status != null">store_status = #{store_status},</if>
+            <if test="store_address != null">store_address = #{store_address},</if>
+            <if test="area_downtemp != null">area_downtemp = #{area_downtemp},</if>
+            <if test="area_downhumidity != null">area_downhumidity = #{area_downhumidity},</if>
+        </trim>
+        where area_id = #{areaId}
+    </update>
+
+    <delete id="deleteAreaByAreaId" parameterType="Long">
+        delete from module_area where area_id = #{areaId}
+    </delete>
+
+    <delete id="deleteAreaByAreaIds" parameterType="String">
+        delete from module_area where area_id in
+        <foreach item="areaId" collection="array" open="(" separator="," close=")">
+            #{areaId}
+        </foreach>
+    </delete>
+</mapper>

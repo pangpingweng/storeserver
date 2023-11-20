@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.DriverMapper">
+    
+    <resultMap type="Driver" id="DriverResult">
+        <result property="driverId"    column="driver_id"    />
+        <result property="driverName"    column="driver_name"    />
+        <result property="phone"    column="phone"    />
+        <result property="address"    column="address"    />
+        <result property="driverExp"    column="driver_exp"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="license_type"    column="license_type"    />
+        <result property="work_type"    column="work_type"    />
+        <result property="driver_ids"    column="driver_ids"    />
+    </resultMap>
+
+    <sql id="selectDriverVo">
+        select driver_id, driver_name, phone, address, driver_exp, create_time,license_type,remark,work_type,driver_ids from module_driver
+    </sql>
+
+    <select id="selectDriverList" parameterType="Driver" resultMap="DriverResult">
+        <include refid="selectDriverVo"/>
+        <where>
+            <if test="driverName != null and driverName != '' or work_type != null and work_type != ''">
+                <!-- 在判断条件不为空的情况下，才添加WHERE子句来构建动态查询条件 -->
+                <if test="driverName != null and driverName != ''">
+                    driver_name like concat('%', #{driverName}, '%')
+                </if>
+                <if test="work_type != null and work_type != ''">
+                    and work_type like concat('%', #{work_type}, '%')
+                </if>
+            </if>
+        </where>
+    </select>
+    
+    <select id="selectDriverByDriverId" parameterType="Long" resultMap="DriverResult">
+        <include refid="selectDriverVo"/>
+        where driver_id = #{driverId}
+    </select>
+        
+    <insert id="insertDriver" parameterType="Driver" useGeneratedKeys="true" keyProperty="driverId">
+        insert into module_driver
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">driver_name,</if>
+            <if test="phone != null">phone,</if>
+            <if test="address != null">address,</if>
+            <if test="driverExp != null">driver_exp,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="license_type != null">license_type,</if>
+            <if test="work_type != null">work_type,</if>
+            <if test="driver_ids != null">driver_ids,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="driverName != null">#{driverName},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="address != null">#{address},</if>
+            <if test="driverExp != null">#{driverExp},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="license_type != null">#{license_type},</if>
+            <if test="work_type != null">#{work_type},</if>
+            <if test="driver_ids != null">#{driver_ids},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDriver" parameterType="Driver">
+        update module_driver
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="driverName != null">driver_name = #{driverName},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="address != null">address = #{address},</if>
+            <if test="driverExp != null">driver_exp = #{driverExp},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="license_type != null">license_type = #{license_type},</if>
+            <if test="work_type != null">work_type = #{work_type},</if>
+            <if test="driver_ids != null">driver_ids = #{driver_ids},</if>
+        </trim>
+        where driver_id = #{driverId}
+    </update>
+
+    <delete id="deleteDriverByDriverId" parameterType="Long">
+        delete from module_driver where driver_id = #{driverId}
+    </delete>
+
+    <delete id="deleteDriverByDriverIds" parameterType="String">
+        delete from module_driver where driver_id in 
+        <foreach item="driverId" collection="array" open="(" separator="," close=")">
+            #{driverId}
+        </foreach>
+    </delete>
+</mapper>

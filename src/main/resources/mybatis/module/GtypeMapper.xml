@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.GtypeMapper">
+    
+    <resultMap type="Gtype" id="GtypeResult">
+        <result property="gtypeId"    column="gtype_id"    />
+        <result property="gtypeName"    column="gtype_name"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectGtypeVo">
+        select gtype_id, gtype_name, create_time, remark from module_gtype
+    </sql>
+
+    <select id="selectGtypeList" parameterType="Gtype" resultMap="GtypeResult">
+        <include refid="selectGtypeVo"/>
+        <where>  
+            <if test="gtypeName != null  and gtypeName != ''"> and gtype_name like concat('%', #{gtypeName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectGtypeByGtypeId" parameterType="Long" resultMap="GtypeResult">
+        <include refid="selectGtypeVo"/>
+        where gtype_id = #{gtypeId}
+    </select>
+        
+    <insert id="insertGtype" parameterType="Gtype" useGeneratedKeys="true" keyProperty="gtypeId">
+        insert into module_gtype
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="gtypeName != null">gtype_name,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="gtypeName != null">#{gtypeName},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGtype" parameterType="Gtype">
+        update module_gtype
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="gtypeName != null">gtype_name = #{gtypeName},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where gtype_id = #{gtypeId}
+    </update>
+
+    <delete id="deleteGtypeByGtypeId" parameterType="Long">
+        delete from module_gtype where gtype_id = #{gtypeId}
+    </delete>
+
+    <delete id="deleteGtypeByGtypeIds" parameterType="String">
+        delete from module_gtype where gtype_id in 
+        <foreach item="gtypeId" collection="array" open="(" separator="," close=")">
+            #{gtypeId}
+        </foreach>
+    </delete>
+</mapper>

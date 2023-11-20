@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.ComplainMapper">
+    
+    <resultMap type="Complain" id="ComplainResult">
+        <result property="complainId"    column="complain_id"    />
+        <result property="shipId"    column="ship_id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName"    column="user_name"    />
+        <result property="complainText"    column="complain_text"    />
+        <result property="complainReply"    column="complain_reply"    />
+        <result property="complainStatus"    column="complain_status"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectComplainVo">
+        select complain_id, ship_id, user_id, user_name, complain_text, complain_reply, complain_status, create_time, remark from module_complain
+    </sql>
+
+    <select id="selectComplainList" parameterType="Complain" resultMap="ComplainResult">
+        <include refid="selectComplainVo"/>
+        <where>  
+            <if test="shipId != null "> and ship_id = #{shipId}</if>
+            <if test="userId != null "> and user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and user_name like concat('%', #{userName}, '%')</if>
+        </where>
+    </select>
+    
+    <select id="selectComplainByComplainId" parameterType="Long" resultMap="ComplainResult">
+        <include refid="selectComplainVo"/>
+        where complain_id = #{complainId}
+    </select>
+        
+    <insert id="insertComplain" parameterType="Complain" useGeneratedKeys="true" keyProperty="complainId">
+        insert into module_complain
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shipId != null">ship_id,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="complainText != null">complain_text,</if>
+            <if test="complainReply != null">complain_reply,</if>
+            <if test="complainStatus != null">complain_status,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shipId != null">#{shipId},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="complainText != null">#{complainText},</if>
+            <if test="complainReply != null">#{complainReply},</if>
+            <if test="complainStatus != null">#{complainStatus},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateComplain" parameterType="Complain">
+        update module_complain
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shipId != null">ship_id = #{shipId},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="userName != null">user_name = #{userName},</if>
+            <if test="complainText != null">complain_text = #{complainText},</if>
+            <if test="complainReply != null">complain_reply = #{complainReply},</if>
+            <if test="complainStatus != null">complain_status = #{complainStatus},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where complain_id = #{complainId}
+    </update>
+
+    <delete id="deleteComplainByComplainId" parameterType="Long">
+        delete from module_complain where complain_id = #{complainId}
+    </delete>
+
+    <delete id="deleteComplainByComplainIds" parameterType="String">
+        delete from module_complain where complain_id in 
+        <foreach item="complainId" collection="array" open="(" separator="," close=")">
+            #{complainId}
+        </foreach>
+    </delete>
+</mapper>

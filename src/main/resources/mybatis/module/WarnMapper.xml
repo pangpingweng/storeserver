@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.WarnMapper">
+    
+    <resultMap type="Warn" id="WarnResult">
+        <result property="warnId"    column="warn_id"    />
+        <result property="areaId"    column="area_id"    />
+        <result property="areaName"    column="area_name"    />
+        <result property="warnName"    column="warn_name"    />
+        <result property="warnReason"    column="warn_reason"    />
+        <result property="warnDesc"    column="warn_desc"    />
+        <result property="warnStatus"    column="warn_status"    />
+        <result property="warnIdea"    column="warn_idea"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+    <sql id="selectWarnVo">
+        select w.warn_id, w.area_id, w.area_name, w.warn_name, w.warn_reason, w.warn_desc, w.warn_status, w.warn_idea, w.create_time, w.remark,w.type
+        from module_warn w
+        left join module_area a on a.area_id = w.area_id
+        left join module_store s on a.store_id = s.store_id
+    </sql>
+
+    <select id="selectWarnList" parameterType="Warn" resultMap="WarnResult">
+        <include refid="selectWarnVo"/>
+        <where>
+            <if test="type != null and type != ''"> and w.type = #{type}</if>
+            <if test="manager_id != null "> and s.manager_id = #{manager_id}</if>
+            <if test="areaName != null  and areaName != ''"> and w.area_name like concat('%', #{areaName}, '%')</if>
+            <if test="warnName != null  and warnName != ''"> and w.warn_name like concat('%', #{warnName}, '%')</if>
+        </where>
+        order by w.create_time desc
+    </select>
+    
+    <select id="selectWarnByWarnId" parameterType="Long" resultMap="WarnResult">
+        <include refid="selectWarnVo"/>
+        where warn_id = #{warnId}
+    </select>
+        
+    <insert id="insertWarn" parameterType="Warn" useGeneratedKeys="true" keyProperty="warnId">
+        insert into module_warn
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="areaId != null">area_id,</if>
+            <if test="areaName != null">area_name,</if>
+            <if test="warnName != null">warn_name,</if>
+            <if test="warnReason != null">warn_reason,</if>
+            <if test="warnDesc != null">warn_desc,</if>
+            <if test="warnStatus != null">warn_status,</if>
+            <if test="warnIdea != null">warn_idea,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="type != null">type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="areaId != null">#{areaId},</if>
+            <if test="areaName != null">#{areaName},</if>
+            <if test="warnName != null">#{warnName},</if>
+            <if test="warnReason != null">#{warnReason},</if>
+            <if test="warnDesc != null">#{warnDesc},</if>
+            <if test="warnStatus != null">#{warnStatus},</if>
+            <if test="warnIdea != null">#{warnIdea},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="type != null">#{type},</if>
+         </trim>
+    </insert>
+
+    <update id="updateWarn" parameterType="Warn">
+        update module_warn
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="areaId != null">area_id = #{areaId},</if>
+            <if test="areaName != null">area_name = #{areaName},</if>
+            <if test="warnName != null">warn_name = #{warnName},</if>
+            <if test="warnReason != null">warn_reason = #{warnReason},</if>
+            <if test="warnDesc != null">warn_desc = #{warnDesc},</if>
+            <if test="warnStatus != null">warn_status = #{warnStatus},</if>
+            <if test="warnIdea != null">warn_idea = #{warnIdea},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="type != null">type = #{type},</if>
+        </trim>
+        where warn_id = #{warnId}
+    </update>
+
+    <delete id="deleteWarnByWarnId" parameterType="Long">
+        delete from module_warn where warn_id = #{warnId}
+    </delete>
+
+    <delete id="deleteWarnByWarnIds" parameterType="String">
+        delete from module_warn where warn_id in 
+        <foreach item="warnId" collection="array" open="(" separator="," close=")">
+            #{warnId}
+        </foreach>
+    </delete>
+</mapper>

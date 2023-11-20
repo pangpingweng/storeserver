@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.GoodsMapper">
+
+    <resultMap type="Goods" id="GoodsResult">
+        <result property="goodsId"    column="goods_id"    />
+        <result property="goodsName"    column="goods_name"    />
+        <result property="userId"    column="user_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="storeId"    column="store_id"    />
+        <result property="storeName"    column="store_name"    />
+        <result property="goodsNum"    column="goods_num"    />
+        <result property="goodsType"    column="goods_type"    />
+        <result property="goods_typeid"    column="goods_typeid"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="goods_areaid"    column="goods_areaid"    />
+        <result property="goods_area"    column="goods_area"    />
+        <result property="goodsType"    column="goods_type"    />
+        <result property="picture"    column="picture"    />
+        <result property="price"    column="price"    />
+        <result property="producer"    column="producer"    />
+    </resultMap>
+
+    <sql id="selectGoodsVo">
+        select g.goods_id, g.goods_name, g.user_id, s.supplier_name as supplier_name, sa.store_name as store_name,
+               g.goods_num, g.create_time, g.update_time, g.remark,
+               g.goods_typeid,
+               g.goods_type, g.store_id, g.picture, g.price, g.producer,
+               goods_areaid,ar.area_name as goods_area
+        from module_goods g
+                 inner join module_supplier s on g.user_id = s.supplier_id
+                 left join module_store sa on g.store_id = sa.store_id
+                 LEFT JOIN module_area ar ON (g.goods_areaid = ar.area_id)
+                 LEFT JOIN module_gtype tp ON (goods_typeid = tp.gtype_id)
+    </sql>
+
+    <select id="selectGoodsList" parameterType="Goods" resultMap="GoodsResult">
+        <include refid="selectGoodsVo"/>
+        <where>
+            <if test="manager_id != null "> and sa.manager_id = #{manager_id}</if>
+            <if test="goodsName != null  and goodsName != ''"> and g.goods_name = #{goodsName}</if>
+            <if test="goodsType != null  and goodsType != ''"> and g.goods_type = #{goodsType}</if>
+            <if test="goods_typeid != null  and goods_typeid != ''"> and g.goods_typeid = #{goods_typeid}</if>
+            <if test="userId != null  and userId != ''"> and g.user_id = #{userId}</if>
+            <if test="supplierName != null  and supplierName != ''"> and s.supplier_name like concat('%', #{supplierName}, '%')</if>
+            <if test="storeId != null  and storeId != ''"> and g.store_id = #{storeId}</if>
+            <if test="goods_areaid != null  and goods_areaid != ''"> and g.goods_areaid = #{goods_areaid}</if>
+        </where>
+    </select>
+
+    <select id="selectGoodsByGoodsId" parameterType="Long" resultMap="GoodsResult">
+        <include refid="selectGoodsVo"/>
+        where g.goods_id = #{goodsId}
+    </select>
+
+    <insert id="insertGoods" parameterType="Goods" useGeneratedKeys="true" keyProperty="goodsId">
+        insert into module_goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="goodsName != null">goods_name,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="goodsNum != null">goods_num,</if>
+            <if test="goodsType != null">goods_type,</if>
+            <if test="goods_typeid != null">goods_typeid,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="goods_areaid != null">goods_areaid,</if>
+            <if test="picture != null">picture,</if>
+            <if test="price != null">price,</if>
+            <if test="producer != null">producer,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="goodsName != null">#{goodsName},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="goodsNum != null">#{goodsNum},</if>
+            <if test="goodsType != null">#{goodsType},</if>
+            <if test="goods_typeid != null">#{goods_typeid},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="goods_areaid != null">#{goods_areaid},</if>
+            <if test="picture != null">#{picture},</if>
+            <if test="price != null">#{price},</if>
+            <if test="producer != null">#{producer},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGoods" parameterType="Goods">
+        update module_goods
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="goodsName != null">goods_name = #{goodsName},</if>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="storeId != null">store_id = #{storeId},</if>
+            <if test="goodsNum != null">goods_num = #{goodsNum},</if>
+            <if test="goodsType != null">goods_type = #{goodsType},</if>
+            <if test="goods_typeid != null">goods_typeid = #{goods_typeid},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="goods_areaid != null">goods_areaid =#{goods_areaid},</if>
+            <if test="picture != null">picture =#{picture},</if>
+            <if test="price != null">price =#{price},</if>
+            <if test="producer != null">producer =#{producer},</if>
+        </trim>
+        where goods_id = #{goodsId}
+    </update>
+
+    <delete id="deleteGoodsByGoodsId" parameterType="Long">
+        delete from module_goods where goods_id = #{goodsId}
+    </delete>
+
+    <delete id="deleteGoodsByGoodsIds" parameterType="String">
+        delete from module_goods where goods_id in
+        <foreach item="goodsId" collection="array" open="(" separator="," close=")">
+            #{goodsId}
+        </foreach>
+    </delete>
+</mapper>

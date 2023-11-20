@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.StockMapper">
+
+    <resultMap type="Stock" id="StockResult">
+        <result property="stockId"    column="stock_id"    />
+        <result property="stockName"    column="stock_name"    />
+        <result property="userId"    column="user_id"    />
+        <result property="userName" column="user_name" />
+        <result property="storeId"    column="store_id"    />
+        <result property="storeName"    column="store_name"    />
+        <result property="stockStatus"    column="stock_status"    />
+        <result property="stockType"    column="stock_type"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="areaname"    column="areaname"    />
+        <result property="gtype"    column="gtype"    />
+        <result property="remark"    column="remark"    />
+        <result property="stockSupplier"    column="stock_supplier"    />
+<!--        <association property="sysUser" javaType="SysUser">-->
+<!--            <result property="nickName" column="nick_name"/>-->
+<!--        </association>-->
+<!--        <association property="supplier" javaType="Supplier">-->
+<!--            <result property="supplierName" column="supplier_name"/>-->
+<!--        </association>-->
+    </resultMap>
+
+<!--    <sql id="selectStockVo">-->
+<!--        select s.stock_id, s.stock_name, s.user_id,-->
+<!--               (case when s.stock_type ='入库'-->
+<!--                         then (select supplier_name from module_supplier-->
+<!--                               where supplier_id = s.user_id)-->
+<!--                     when s.stock_type ='出库'-->
+<!--                         then (select nick_name from sys_user-->
+<!--                               where user_id = s.user_id)-->
+<!--                     else null-->
+<!--                   end) as userNameResult,-->
+<!--               s.store_id, s.store_name, s.stock_status,s.stock_supplier,-->
+<!--               s.stock_type, s.create_time, s.update_time, s.areaname, s.gtype, s.remark from module_stock s-->
+<!--    </sql>-->
+    <sql id="selectStockVo">
+        select s.stock_id, s.stock_name, s.user_id, s.user_name, s.store_id, s.store_name, s.stock_status, s.stock_supplier,
+               s.stock_type, s.create_time, s.update_time, s.areaname, s.gtype, s.remark from module_stock s
+         left join module_store st on s.store_id = st.store_id
+    </sql>
+    <select id="selectStockList" parameterType="Stock" resultMap="StockResult">
+        <include refid="selectStockVo"/>
+        <where>
+            <if test="manager_id != null "> and st.manager_id = #{manager_id}</if>
+            <if test="stockName != null  and stockName != ''"> and s.stock_name like concat('%', #{stockName}, '%')</if>
+            <if test="storeName != null  and storeName != ''"> and s.store_name like concat('%', #{storeName}, '%')</if>
+            <if test="userId != null "> and s.user_id = #{userId}</if>
+            <if test="userName != null  and userName != ''"> and s.user_name like concat('%', #{userName}, '%')</if>
+            <if test="stockSupplier != null  and stockSupplier != ''"> and s.stock_supplier like concat('%', #{stockSupplier}, '%')</if>
+            <if test="stockType != null and stockType != ''"> and s.stock_type = #{stockType}</if>
+            <if test="stockStatus != null and stockStatus != ''"> and s.stock_status = #{stockStatus}</if>
+        </where>
+    </select>
+
+    <select id="selectStockByStockId" parameterType="Long" resultMap="StockResult">
+        <include refid="selectStockVo"/>
+        where s.stock_id = #{stockId}
+    </select>
+
+    <insert id="insertStock" parameterType="Stock" useGeneratedKeys="true" keyProperty="stockId">
+        insert into module_stock
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stockName != null">stock_name,</if>
+            <if test="userId != null">user_id,</if>
+            <if test="userName != null">user_name,</if>
+            <if test="storeId != null">store_id,</if>
+            <if test="storeName != null">store_name,</if>
+            <if test="stockStatus != null">stock_status,</if>
+            <if test="stockType != null">stock_type,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="areaname != null">areaname,</if>
+            <if test="gtype != null">gtype,</if>
+            <if test="remark != null">remark,</if>
+            <if test="stockSupplier != null">stock_supplier,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stockName != null">#{stockName},</if>
+            <if test="userId != null">#{userId},</if>
+            <if test="userName != null">#{userName},</if>
+            <if test="storeId != null">#{storeId},</if>
+            <if test="storeName != null">#{storeName},</if>
+            <if test="stockStatus != null">#{stockStatus},</if>
+            <if test="stockType != null">#{stockType},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="areaname != null">#{areaname},</if>
+            <if test="gtype != null">#{gtype},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="stockSupplier != null">#{stockSupplier},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStock" parameterType="Stock">
+        update module_stock s
+        <set>
+            <if test="stockName != null">s.stock_name = #{stockName},</if>
+            <if test="userId != null">s.user_id = #{userId},</if>
+            <if test="userName != null">s.user_name = #{userName},</if>
+            <if test="storeId != null">s.store_id = #{storeId},</if>
+            <if test="storeName != null">s.store_name = #{storeName},</if>
+            <if test="stockStatus != null">s.stock_status = #{stockStatus},</if>
+            <if test="stockType != null">s.stock_type = #{stockType},</if>
+            <if test="createTime != null">s.create_time = #{createTime},</if>
+            <if test="updateTime != null">s.update_time = #{updateTime},</if>
+            <if test="areaname != null">s.areaname = #{areaname},</if>
+            <if test="gtype != null">s.gtype = #{gtype},</if>
+            <if test="remark != null">s.remark = #{remark},</if>
+            <if test="stockSupplier != null">s.stock_supplier = #{stockSupplier},</if>
+        </set>
+        where s.stock_id = #{stockId}
+    </update>
+
+    <delete id="deleteStockByStockId" parameterType="Long">
+        delete from module_stock where stock_id = #{stockId}
+    </delete>
+
+    <delete id="deleteStockByStockIds" parameterType="String">
+        delete from module_stock where stock_id in
+        <foreach item="stockId" collection="array" open="(" separator="," close=")">
+            #{stockId}
+        </foreach>
+    </delete>
+</mapper>

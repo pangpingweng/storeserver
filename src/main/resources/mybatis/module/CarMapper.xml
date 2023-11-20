@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.project.module.mapper.CarMapper">
+    
+    <resultMap type="Car" id="CarResult">
+        <result property="carId"    column="car_id"    />
+        <result property="carName"    column="car_name"    />
+        <result property="buyYear"    column="buy_year"    />
+        <result property="carPlate"    column="car_plate"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="car_type"    column="car_type"    />
+        <result property="car_weight"    column="car_weight"    />
+        <result property="car_status"    column="car_status"    />
+    </resultMap>
+
+    <sql id="selectCarVo">
+        select car_id, car_name, buy_year, car_plate, create_time, remark,car_type,car_weight,car_status from module_car
+    </sql>
+
+    <select id="selectCarList" parameterType="Car" resultMap="CarResult">
+        <include refid="selectCarVo"/>
+        <where>
+            <if test="carName != null and carName != ''">
+                car_name like concat('%', #{carName}, '%') AND
+            </if>
+            <if test="car_type != null and car_type != ''">
+                car_type like concat('%', #{car_type}, '%') AND
+            </if>
+            <if test="car_status != null and car_status != ''">
+                car_status like concat('%', #{car_status}, '%') AND
+            </if>
+            1=1 <!-- 添加一个条件，确保其它条件都有and或or连接 -->
+        </where>
+    </select>
+    
+    <select id="selectCarByCarId" parameterType="Long" resultMap="CarResult">
+        <include refid="selectCarVo"/>
+        where car_id = #{carId}
+    </select>
+        
+    <insert id="insertCar" parameterType="Car" useGeneratedKeys="true" keyProperty="carId">
+        insert into module_car
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="carName != null">car_name,</if>
+            <if test="buyYear != null">buy_year,</if>
+            <if test="carPlate != null">car_plate,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="car_type != null">car_type,</if>
+            <if test="car_weight != null">car_weight,</if>
+            <if test="car_status != null">car_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="carName != null">#{carName},</if>
+            <if test="buyYear != null">#{buyYear},</if>
+            <if test="carPlate != null">#{carPlate},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="car_type != null">#{car_type},</if>
+            <if test="car_weight != null">#{car_weight},</if>
+            <if test="car_status != null">#{car_status},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCar" parameterType="Car">
+        update module_car
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="carName != null">car_name = #{carName},</if>
+            <if test="buyYear != null">buy_year = #{buyYear},</if>
+            <if test="carPlate != null">car_plate = #{carPlate},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="car_type != null">car_type = #{car_type},</if>
+            <if test="car_weight != null">car_weight = #{car_weight},</if>
+            <if test="car_status != null">car_status = #{car_status},</if>
+        </trim>
+        where car_id = #{carId}
+    </update>
+
+    <delete id="deleteCarByCarId" parameterType="Long">
+        delete from module_car where car_id = #{carId}
+    </delete>
+
+    <delete id="deleteCarByCarIds" parameterType="String">
+        delete from module_car where car_id in 
+        <foreach item="carId" collection="array" open="(" separator="," close=")">
+            #{carId}
+        </foreach>
+    </delete>
+</mapper>
